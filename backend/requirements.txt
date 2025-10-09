@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+requests
+sqlalchemy
+databases
+alembic
+passlib[bcrypt]
+python-jose
+email-validator
+httpx
+pytest
+pytest-asyncio
+aiofiles
+
