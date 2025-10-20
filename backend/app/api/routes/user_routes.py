@@ -1,21 +1,19 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from app.services.user_service import create_user, get_users
+# app/api/routes/user_routes.py
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.models.user import User
 
-router = APIRouter()
+router = APIRouter(prefix="/users", tags=["Users"])
 
-class UserCreate(BaseModel):
-    username: str
-    email: str
-    password: str
+@router.get("/", response_model=list[dict])
+def get_all_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return [{"id": u.id, "email": u.email, "role": u.role} for u in users]
 
-@router.post("/", summary="Create a user")
-def add_user(user: UserCreate):
-    # basic checks (unique constraint handled by DB)
-    res = create_user(user.username, user.email, user.password)
-    return res
-
-@router.get("/", summary="List users")
-def list_users():
-    users = get_users()
-    return [{"id": u.id, "username": u.username, "email": u.email} for u in users]
+@router.get("/{user_id}")
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+    return {"id": user.id, "email": user.email, "role": user.role}

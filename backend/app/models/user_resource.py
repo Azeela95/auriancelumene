@@ -15,3 +15,6 @@ class UserResource(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="resources")
+    # Si tu veux lier à Resource
+    resource_id = Column(Integer, ForeignKey("resources.id"))
+    resource = relationship("Resource", back_populates="user_resources")
